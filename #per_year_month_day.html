@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-8">
+                <label for="floatingInput">輸入年跟月(民國年 /xx)</label>
+                <input type="text" class="form-control" id="text" placeholder="月份">
+
+                <div class=" d-flex justify-content-center">
+                    <button class="btn btn-primary mt-3" id="submit">按鈕</button>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <table class="table table-bordered border-1 border-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">日期</th>
+                        <th scope="col">男性就醫人數</th>
+                        <th scope="col">女性就醫人數</th>
+                        <th scope="col">累計</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                    <!-- <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                    </tr> -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.6.3.min.js"></script>
+    <script>
+        var i;
+        var j;
+        var his_date = [];
+        var man = 0;
+        var woman = 0;
+        $(function () {
+            $("#submit").bind("click", function () {
+                if ($("#text").val() != "") {
+                    man = 0;
+                    woman = 0;
+                    his_date = [];
+                    $.ajax({
+                        type: "get",
+                        url: "xml/HISTORY.json",
+                        dataType: "json",
+                        async: "false",
+                        success: showdata,
+                        error: function () {
+                            alert("error_xml/HISTORY.json");
+                        }
+                    });
+                } else {
+                    alert("請勿空白");
+                }
+            });
+        });
+
+        function showdata(data) {
+
+            console.log(data.dataroot.HISTORY);
+            console.log(data.dataroot.HISTORY.length);
+            
+            for (i = 0; i < data.dataroot.HISTORY.length; i++) {
+                if ($("#text").val() == data.dataroot.HISTORY[i].HIS_DATE) {
+                    console.log(data.dataroot.HISTORY[i].HIS_DATE);
+                    his_date.push(data.dataroot.HISTORY[i]);
+                }
+
+            }
+            $.ajax({
+                type: "get",
+                url: "xml/PATIENT.json",
+                dataType: "json",
+                async: "false",
+                success: showdata_patient,
+                error: function () {
+                    alert("error_xml/PATIENT.json");
+                }
+            });
+            console.log(his_date);
+
+        }
+
+        function showdata_patient(data) {
+            console.log(data.dataroot.PATIENT);
+            // console.log(his_date[0].HIS_PAT_ID);
+            console.log(his_date);
+            for (j = 0; j < his_date.length; j++) {
+                for (i = 0; i < data.dataroot.PATIENT.length; i++) {
+                    if (his_date[j].HIS_PAT_ID == data.dataroot.PATIENT[i].PAT_ID) {
+                        if (data.dataroot.PATIENT[i].PAT_SEX == 0) {
+                            woman++;
+                        } else {
+                            man++;
+                        }
+                    }
+                }
+            }
+            
+
+            var strHTML = `
+                    <tr>
+                        <th scope="row">${his_date[0].HIS_DATE}</th>
+                        <td>${man}</td>
+                        <td>${woman}</td>
+                        <td>${woman+man}</td>
+                    </tr>`;
+            
+            $("#tbody").append(strHTML);
+
+        }
+
+    </script>
+
+</body>
+
+</html>

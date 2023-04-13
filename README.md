@@ -1,5 +1,5 @@
 <h2>輸入年跟月(民國年 xxx/xx)</h2>
-<img src="img/font-end.jpg" height="350" alt="">
+<img src="img/螢幕擷取畫面 2023-04-09 214229.png" height="350" alt="">
 <ol>
 <li>使用Ajax實作</li>
 <ul>
